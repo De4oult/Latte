@@ -1,1 +1,14 @@
-put standart = 45
+let b = 45 / 5;
+
+let obj = {
+    x: 12,
+    y: 32,
+
+    c: 32,
+    b,
+
+    comp: {
+        ast: 412,
+        col: 12
+    }
+};

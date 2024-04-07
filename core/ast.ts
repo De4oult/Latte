@@ -4,6 +4,8 @@ export type NodeType =
     | 'VariableDeclaration'
 
     // expr
+    | 'Property'
+    | 'Object'
     | 'AssignmentExpression'
     | 'Number'
     | 'Identifier' 
@@ -49,4 +51,15 @@ export interface Identifier extends Expression {
 export interface Number extends Expression {
     kind:  'Number';
     value: number;
+}
+
+export interface Property extends Expression {
+    kind:   'Property';
+    key:    string;
+    value?: Expression;
+}
+
+export interface Object extends Expression {
+    kind:       'Object';
+    properties: Property[];
 }

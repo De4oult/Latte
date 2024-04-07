@@ -1,4 +1,14 @@
-import { RuntimeValue } from './values.ts';
+import { RuntimeValue, make_boolean, make_null } from './values.ts';
+
+export const setupGlobalEnvironment = () => { // configure scope
+    const env = new Environment();
+
+    env.declareVariable('true',  make_boolean(true), true);
+    env.declareVariable('false', make_boolean(false), true);
+    env.declareVariable('null',  make_null(), true);
+
+    return env;
+}
 
 export default class Environment {
     private parent?: Environment;
@@ -6,6 +16,7 @@ export default class Environment {
     private constants: Set<string>;
 
     constructor(parentENV?: Environment) {
+        const global   = parentENV ? true : false;
         this.parent    = parentENV;
         this.varibales = new Map();
         this.constants = new Set();

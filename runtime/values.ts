@@ -1,4 +1,4 @@
-export type ValueType = 'null' | 'number' | 'boolean';
+export type ValueType = 'null' | 'number' | 'boolean' | 'object';
 
 export interface RuntimeValue {
     type: ValueType;
@@ -17,6 +17,11 @@ export interface BooleanValue extends RuntimeValue {
 export interface NumberValue extends RuntimeValue {
     type:  'number';
     value: number;
+}
+
+export interface ObjectValue extends RuntimeValue {
+    type:       'object';
+    properties: Map<string, RuntimeValue>;
 }
 
 export const make_null    = (n = 0)    => ({ type: 'null', value: null } as NullValue);

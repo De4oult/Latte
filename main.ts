@@ -1,15 +1,21 @@
 import Parser from './core/parser.ts';
-import Environment from './runtime/environment.ts';
+import Environment, { setupGlobalEnvironment } from './runtime/environment.ts';
 import { evaluate } from './runtime/interpreter.ts';
-import { make_number, make_null, make_boolean } from './runtime/values.ts';
+
+const execute = async(filename: string) => {
+    const parser  = new Parser();
+    const env     = setupGlobalEnvironment();
+
+    const source  = await Deno.readTextFile(filename);
+    const program = parser.produceAST(source);
+    const result  = evaluate(program, env);
+
+    console.log(result);
+}
 
 const latte = async() => {
     const parser = new Parser();
     const env    = new Environment();
-
-    env.declareVariable('true',  make_boolean(true), true);
-    env.declareVariable('false', make_boolean(false), true);
-    env.declareVariable('null',  make_null(), true);
 
     console.log('Latte v0.1')
 
@@ -25,4 +31,4 @@ const latte = async() => {
     }
 }
 
-latte();
+execute('./source.lt');

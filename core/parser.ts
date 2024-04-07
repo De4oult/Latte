@@ -1,4 +1,4 @@
-import { Statement, Program, Expression, BinaryExpression, Number, Identifier, Null, VariableDeclaration, AssignmentExpression } from './ast.ts';
+import { Statement, Program, Expression, BinaryExpression, Number, Identifier, Null, VariableDeclaration, AssignmentExpression, Property, Object } from './ast.ts';
 import { tokenize, Token, TokenType } from './lexer.ts';
 
 export default class Parser {
@@ -54,7 +54,7 @@ export default class Parser {
     private parse_expression = (): Expression => this.parse_assignment_expression();
 
     parse_assignment_expression = (): Expression => {
-        const left = this.parse_additive_expression();
+        const left = this.parse_object_expression();
 
         if(this.at().type == TokenType.Equals) {
             this.eat();
@@ -64,6 +64,37 @@ export default class Parser {
         }
 
         return left;
+    }
+
+    private parse_object_expression = (): Expression => {
+        if(this.at().type != TokenType.LBracket) return this.parse_additive_expression();
+
+        this.eat();
+        const properties = new Array<Property>();
+
+        while(this.not_eof() && this.at().type != TokenType.RBracket) {
+            const key = this.expect(TokenType.Identifier, 'Key expected').value;
+
+            if(this.at().type == TokenType.Comma) {
+                this.eat();
+                properties.push({ key, kind: 'Property' } as Property);
+                continue;
+            }
+            else if(this.at().type == TokenType.RBracket) {
+                properties.push({ key, kind: 'Property' } as Property);
+                continue;
+            }
+
+            this.expect(TokenType.Colon, 'Missing colon following identifier in Object');
+            const value = this.parse_expression();
+
+            properties.push({ kind: 'Property', value, key });
+            
+            if(this.at().type != TokenType.RBracket) this.expect(TokenType.Comma, 'Expected comma or closing bracket');
+        }
+
+        this.expect(TokenType.RBracket, 'Object missing closing bracket');
+        return { kind: 'Object', properties } as Object;
     }
 
     private parse_additive_expression = (): Expression => {

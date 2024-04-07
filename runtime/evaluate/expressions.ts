@@ -1,7 +1,7 @@
-import { AssignmentExpression, BinaryExpression, Identifier } from '../../core/ast.ts';
+import { AssignmentExpression, BinaryExpression, Identifier, Object } from '../../core/ast.ts';
 import Environment from '../environment.ts';
 import { evaluate } from '../interpreter.ts';
-import { NumberValue, RuntimeValue, make_null } from '../values.ts';
+import { NumberValue, ObjectValue, RuntimeValue, make_null } from '../values.ts';
 
 export const evaluate_numeric_binary_expression = (lhs: NumberValue, rhs: NumberValue, operator: string): NumberValue => {
     let result = 0;
@@ -34,4 +34,16 @@ export const evaluate_assignment = (node: AssignmentExpression, env: Environment
     
     const name = (node.assign as Identifier).symbol;
     return env.assignVariable(name, evaluate(node.value, env));
+}
+
+export const evaluate_object_expression = (obj: Object, env: Environment): RuntimeValue => {
+    const object = { type: 'object', properties: new Map() } as ObjectValue;
+
+    for(const { key, value } of obj.properties) {
+        const runtimeValue = (value == undefined) ? env.lookupVariable(key) : evaluate(value, env);
+
+        object.properties.set(key, runtimeValue);
+    }
+    
+    return object;
 }

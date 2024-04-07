@@ -5,6 +5,12 @@ export enum TokenType {
     Equals,
     LParen,
     RParen,
+    LBrace,
+    RBrace,
+    LBracket,
+    RBracket,
+    Comma,
+    Colon,
     Semicolon,
 
     BinaryOperator,
@@ -28,7 +34,7 @@ const KEYWORDS: Record<string, TokenType> = {
 
 const token      = (value: string = '', type: TokenType): Token => ({ value, type });
 const isAlpha    = (source: string): Boolean => source.toUpperCase() != source.toLowerCase();
-const isSkipable = (source: string): Boolean => source == ' ' || source == '\n' || source == '\t';
+const isSkipable = (source: string): Boolean => source == ' ' || source == '\n' || source == '\t' || source == '\r';
 const isInt      = (source: string): Boolean => {
     const c = source.charCodeAt(0);
     const bounds = ['0'.charCodeAt(0), '9'.charCodeAt(0)];
@@ -44,12 +50,18 @@ export const tokenize = (content: string): Token[] => {
         switch(source[0]) {
             case '(': tokens.push(token(source.shift(), TokenType.LParen)); break;
             case ')': tokens.push(token(source.shift(), TokenType.RParen)); break;
+            case '[': tokens.push(token(source.shift(), TokenType.LBrace)); break;
+            case ']': tokens.push(token(source.shift(), TokenType.RBrace)); break;
+            case '{': tokens.push(token(source.shift(), TokenType.LBracket)); break;
+            case '}': tokens.push(token(source.shift(), TokenType.RBracket)); break;
             case '=': tokens.push(token(source.shift(), TokenType.Equals)); break;
             case '+': tokens.push(token(source.shift(), TokenType.BinaryOperator)); break;
             case '-': tokens.push(token(source.shift(), TokenType.BinaryOperator)); break;
             case '*': tokens.push(token(source.shift(), TokenType.BinaryOperator)); break;
             case '/': tokens.push(token(source.shift(), TokenType.BinaryOperator)); break;
             case '%': tokens.push(token(source.shift(), TokenType.BinaryOperator)); break;
+            case ',': tokens.push(token(source.shift(), TokenType.Comma)); break;
+            case ':': tokens.push(token(source.shift(), TokenType.Colon)); break;
             case ';': tokens.push(token(source.shift(), TokenType.Semicolon)); break;
             default:
                 if(isInt(source[0])) {
