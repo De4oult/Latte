@@ -1,5 +1,5 @@
 import Parser from './core/parser.ts';
-import Environment from './runtime/environments.ts';
+import Environment from './runtime/environment.ts';
 import { evaluate } from './runtime/interpreter.ts';
 import { make_number, make_null, make_boolean } from './runtime/values.ts';
 

@@ -1,26 +1,30 @@
 import { RuntimeValue } from './values.ts';
 
-
-
 export default class Environment {
     private parent?: Environment;
-    
     private varibales: Map<string, RuntimeValue>;
+    private constants: Set<string>;
 
     constructor(parentENV?: Environment) {
         this.parent    = parentENV;
         this.varibales = new Map();
+        this.constants = new Set();
     }
 
-    public declareVariable(name: string, value: RuntimeValue): RuntimeValue {
+    public declareVariable(name: string, value: RuntimeValue, isConstant: boolean): RuntimeValue {
         if(this.varibales.has(name)) throw `Cannot declare variable '${name}'. As it already is defined`;
 
         this.varibales.set(name, value);
+
+        if(isConstant) this.constants.add(name);
+
         return value;
     }
 
     public assignVariable(name: string, value: RuntimeValue): RuntimeValue {
         const env = this.resolve(name);
+
+        if(env.constants.has(name)) throw `Cannot reasign to variable '${name}'. It was declated as constant`;
 
         env.varibales.set(name, value);
     

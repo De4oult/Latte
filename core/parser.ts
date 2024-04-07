@@ -1,4 +1,4 @@
-import { Statement, Program, Expression, BinaryExpression, Number, Identifier, Null } from './ast.ts';
+import { Statement, Program, Expression, BinaryExpression, Number, Identifier, Null, VariableDeclaration } from './ast.ts';
 import { tokenize, Token, TokenType } from './lexer.ts';
 
 export default class Parser {
@@ -21,7 +21,35 @@ export default class Parser {
         return prev;
     }
 
-    private parse_statement = (): Statement => this.parse_expression();
+    private parse_statement = (): Statement => {
+        switch(this.at().type) {
+            case TokenType.Let:
+            case TokenType.Const: return this.parse_variable_declaration();
+            default:              return this.parse_expression();
+        }
+    }
+
+    private parse_variable_declaration = (): Statement => {
+        const isConstant = this.eat().type == TokenType.Const;
+        const identifier = this.expect(
+            TokenType.Identifier,
+            'Expected identifier name',
+        ).value;
+
+        if(this.at().type == TokenType.Semicolon) {
+            this.eat();
+            if(isConstant) throw 'Must assign value to constant expression. No value provided';
+
+            return { kind: 'VariableDeclaration', identifier, constant: false, value: undefined } as VariableDeclaration;
+        }
+
+        this.expect(TokenType.Equals, 'Expected equals following identifier in variable declaration');
+        const declaration = { kind: 'VariableDeclaration', identifier, value: this.parse_expression(), constant: isConstant } as VariableDeclaration;
+
+        this.expect(TokenType.Semicolon, 'Must end with semicolon');
+
+        return declaration;
+    }
 
     private parse_expression = (): Expression => this.parse_additive_expression();
 

@@ -1,13 +1,15 @@
 export enum TokenType {
     Number,
     Identifier,
+
     Equals,
     LParen,
     RParen,
+    Semicolon,
 
     BinaryOperator,
 
-    Put,
+    Let,
     Const,
 
     EOF
@@ -19,7 +21,8 @@ export interface Token {
 }
 
 const KEYWORDS: Record<string, TokenType> = {
-    put : TokenType.Put
+    let:   TokenType.Let,
+    const: TokenType.Const
 }
 
 
@@ -47,6 +50,7 @@ export const tokenize = (content: string): Token[] => {
             case '*': tokens.push(token(source.shift(), TokenType.BinaryOperator)); break;
             case '/': tokens.push(token(source.shift(), TokenType.BinaryOperator)); break;
             case '%': tokens.push(token(source.shift(), TokenType.BinaryOperator)); break;
+            case ';': tokens.push(token(source.shift(), TokenType.Semicolon)); break;
             default:
                 if(isInt(source[0])) {
                     let number = '';
