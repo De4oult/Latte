@@ -1,4 +1,4 @@
-import { Statement, Program, Expression, BinaryExpression, Number, Identifier, Null, VariableDeclaration } from './ast.ts';
+import { Statement, Program, Expression, BinaryExpression, Number, Identifier, Null, VariableDeclaration, AssignmentExpression } from './ast.ts';
 import { tokenize, Token, TokenType } from './lexer.ts';
 
 export default class Parser {
@@ -29,7 +29,7 @@ export default class Parser {
         }
     }
 
-    private parse_variable_declaration = (): Statement => {
+    parse_variable_declaration = (): Statement => {
         const isConstant = this.eat().type == TokenType.Const;
         const identifier = this.expect(
             TokenType.Identifier,
@@ -51,7 +51,20 @@ export default class Parser {
         return declaration;
     }
 
-    private parse_expression = (): Expression => this.parse_additive_expression();
+    private parse_expression = (): Expression => this.parse_assignment_expression();
+
+    parse_assignment_expression = (): Expression => {
+        const left = this.parse_additive_expression();
+
+        if(this.at().type == TokenType.Equals) {
+            this.eat();
+            const value = this.parse_assignment_expression();
+
+            return { value, assign: left, kind: 'AssignmentExpression' } as AssignmentExpression;
+        }
+
+        return left;
+    }
 
     private parse_additive_expression = (): Expression => {
         let left = this.parse_multiplicitave_expression();

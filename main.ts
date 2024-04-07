@@ -7,9 +7,9 @@ const latte = async() => {
     const parser = new Parser();
     const env    = new Environment();
 
-    env.declareVariable('true',  make_boolean(true));
-    env.declareVariable('false', make_boolean(false));
-    env.declareVariable('null',  make_null());
+    env.declareVariable('true',  make_boolean(true), true);
+    env.declareVariable('false', make_boolean(false), true);
+    env.declareVariable('null',  make_null(), true);
 
     console.log('Latte v0.1')
 

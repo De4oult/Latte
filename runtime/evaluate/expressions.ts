@@ -1,4 +1,4 @@
-import { BinaryExpression, Identifier } from '../../core/ast.ts';
+import { AssignmentExpression, BinaryExpression, Identifier } from '../../core/ast.ts';
 import Environment from '../environment.ts';
 import { evaluate } from '../interpreter.ts';
 import { NumberValue, RuntimeValue, make_null } from '../values.ts';
@@ -28,3 +28,10 @@ export const evaluate_binary_expression = (binary: BinaryExpression, env: Enviro
 }
 
 export const evaluate_identifier = (identifier: Identifier, env: Environment): RuntimeValue => env.lookupVariable(identifier.symbol);
+
+export const evaluate_assignment = (node: AssignmentExpression, env: Environment): RuntimeValue => {
+    if(node.assign.kind != 'Identifier') throw `Cannot assign value to not-identifier`;
+    
+    const name = (node.assign as Identifier).symbol;
+    return env.assignVariable(name, evaluate(node.value, env));
+}
